@@ -131,7 +131,7 @@ def setup_bravia(config, pin, hass, add_devices):
         request_configuration(config, hass, add_devices)
         return
     else:
-        mac = _get_mac_address(host)
+        mac = _get_mac_address(host)    # TODO or get mac from config file
         if mac is not None:
             mac = mac.decode('utf8')
         # If we came here and configuring this host, mark as done
@@ -148,7 +148,6 @@ def setup_bravia(config, pin, hass, add_devices):
 
         add_devices([BraviaTVDevice(host, psk, mac, broadcast, name,
                                     pin, amp, android, source_filter)])
-
 
 def request_configuration(config, hass, add_devices):
     """Request configuration steps from the user."""
