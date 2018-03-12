@@ -121,6 +121,7 @@ def setup_bravia(config, pin, hass, add_devices):
     host = config.get(CONF_HOST)
     psk = config.get(CONF_PSK)
     mac = config.get(CONF_MAC)
+    broadcast = config.get(CONF_BROADCAST)
     name = config.get(CONF_NAME)
     amp = config.get(CONF_AMP)
     android = config.get(CONF_ANDROID)
