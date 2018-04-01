@@ -218,6 +218,8 @@ class BraviaTVDevice(MediaPlayerDevice):
         self._volume = None
         self._start_time = None
         self._end_time = None
+        if mac is not None: ### Make MAC mandatory for this
+            self._unique_id = '{}-{}'.format(mac, name)
 
         if self._psk:
             _LOGGER.debug(
@@ -314,6 +316,11 @@ class BraviaTVDevice(MediaPlayerDevice):
                                         in self._source_filter)}
                 for key in filtered_dict:
                     self._source_list.append(key)
+
+    @property
+    def unique_id(self):
+        """Return the unique ID of the device."""
+        return self._unique_id
 
     @property
     def name(self):
