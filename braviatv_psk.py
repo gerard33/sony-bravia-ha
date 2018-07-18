@@ -12,10 +12,10 @@ import voluptuous as vol
 from homeassistant.components.media_player import (
     SUPPORT_NEXT_TRACK, SUPPORT_PAUSE, SUPPORT_PREVIOUS_TRACK, SUPPORT_TURN_ON,
     SUPPORT_TURN_OFF, SUPPORT_VOLUME_MUTE, SUPPORT_VOLUME_STEP, SUPPORT_PLAY,
-    SUPPORT_PLAY_MEDIA, SUPPORT_VOLUME_SET, SUPPORT_SELECT_SOURCE,
+    SUPPORT_PLAY_MEDIA, SUPPORT_VOLUME_SET, SUPPORT_SELECT_SOURCE, DOMAIN,
     MediaPlayerDevice, PLATFORM_SCHEMA, MEDIA_TYPE_TVSHOW, SUPPORT_STOP)
 from homeassistant.const import (
-    CONF_HOST, CONF_NAME, CONF_MAC, STATE_OFF, STATE_ON)
+    ATTR_ENTITY_ID, CONF_HOST, CONF_NAME, CONF_MAC, STATE_OFF, STATE_ON)
 import homeassistant.helpers.config_validation as cv
 from homeassistant.util.json import load_json, save_json
 
@@ -63,6 +63,15 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_SOURCE_FILTER, default=[]): vol.All(
         cv.ensure_list, [cv.string])})
 
+SERVICE_BRAVIA_COMMAND = 'bravia_command'
+
+ATTR_COMMAND_ID = 'command_id'
+
+BRAVIA_COMMAND_SCHEMA = vol.Schema({
+    vol.Optional(ATTR_ENTITY_ID): cv.entity_id,
+    vol.Required(ATTR_COMMAND_ID): cv.string,
+})
+
 # pylint: disable=unused-argument
 
 
@@ -77,6 +86,7 @@ def _get_mac_address(ip_address):
     if match is not None:
         return match.groups()[0]
     return None
+
 
 def setup_platform(hass, config, add_devices, discovery_info=None):
     """Set up the Sony Bravia TV platform."""
@@ -104,14 +114,16 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
                 pin = host_config['pin']
                 mac = host_config['mac']
                 name = config.get(CONF_NAME)
-                add_devices([BraviaTVDevice(host, psk, mac, broadcast, name,
-                                            pin, amp, android, source_filter)])
+                create_and_add_device(hass, add_devices, host, psk, mac,
+                                      broadcast, name, pin, amp, android,
+                                      source_filter)
                 return
 
         setup_bravia(config, pin, hass, add_devices)
     else:
-        add_devices([BraviaTVDevice(host, psk, mac, broadcast, name,
-                                    pin, amp, android, source_filter)])
+        create_and_add_device(hass, add_devices, host, psk, mac, broadcast,
+                              name, pin, amp, android, source_filter)
+
 
 def setup_bravia(config, pin, hass, add_devices):
     """Set up a Sony Bravia TV based on host parameter."""
@@ -143,8 +155,9 @@ def setup_bravia(config, pin, hass, add_devices):
             hass.config.path(BRAVIA_CONFIG_FILE),
             {host: {'pin': pin, 'host': host, 'mac': mac}})
 
-        add_devices([BraviaTVDevice(host, psk, mac, broadcast, name,
-                                    pin, amp, android, source_filter)])
+        create_and_add_device(hass, add_devices, host, psk, mac, broadcast,
+                              name, pin, amp, android, source_filter)
+
 
 def request_configuration(config, hass, add_devices):
     """Request configuration steps from the user."""
@@ -179,6 +192,19 @@ def request_configuration(config, hass, add_devices):
         submit_caption="Confirm",
         fields=[{'id': 'pin', 'name': 'Enter the pin', 'type': ''}]
     )
+
+
+def create_and_add_device(hass, add_devices, host, psk, mac, broadcast, name,
+                          pin, amp, android, source_filter):
+    bravia_tv_device = BraviaTVDevice(host, psk, mac, broadcast, name, pin,
+                                      amp, android, source_filter)
+    add_devices([bravia_tv_device])
+
+    hass.services.register(
+        DOMAIN, SERVICE_BRAVIA_COMMAND,
+        lambda service:
+            bravia_tv_device.send_command(service.data[ATTR_COMMAND_ID]),
+        schema=BRAVIA_COMMAND_SCHEMA)
 
 
 class BraviaTVDevice(MediaPlayerDevice):
@@ -503,3 +529,7 @@ class BraviaTVDevice(MediaPlayerDevice):
             self._braviarc.send_command(media_id)
         else:
             _LOGGER.warning("Unsupported media_id: %s", media_id)
+
+    def send_command(self, command_id):
+        """Sends named command to TV."""
+        self._braviarc.send_command(command_id)
