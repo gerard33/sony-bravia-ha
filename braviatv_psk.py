@@ -259,7 +259,7 @@ class BraviaTVDevice(MediaPlayerDevice):
                     self._program_media_type = playing_info.get(
                         'programMediaType')
                     self._channel_number = playing_info.get('dispNum')
-                    self._source = playing_info.get('source')
+                    self._source = playing_info.get('title')
                     self._content_uri = playing_info.get('uri')
                     self._duration = playing_info.get('durationSec')
                     self._start_date_time = playing_info.get('startDateTime')
