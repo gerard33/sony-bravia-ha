@@ -223,7 +223,7 @@ class BraviaTVDevice(MediaPlayerDevice):
 
         if self._psk:
             _LOGGER.debug(
-                "Set up Sony Bravia TV withIP: %s, PSK: %s, MAC: %s",
+                "Set up Sony Bravia TV with IP: %s, PSK: %s, MAC: %s",
                 host, psk, mac)
             self.update()
         else:
