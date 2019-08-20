@@ -28,7 +28,7 @@ from homeassistant.const import (
 import homeassistant.helpers.config_validation as cv
 from homeassistant.util.json import load_json, save_json
 
-REQUIREMENTS = ['pySonyBraviaPSK==0.3.1']
+REQUIREMENTS = ['pySonyBraviaPSK==0.3.2b0']
 
 _LOGGER = logging.getLogger(__name__)
 
