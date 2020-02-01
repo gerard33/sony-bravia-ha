@@ -3,9 +3,9 @@ Sony Bravia component for Home Assistant, which can be used for PIN and Pre-Shar
 
 To get started put /custom_components/braviatv_psk/media_player.py here:
 
-<config directory>/custom_components/braviatv_psk/media_player.py
+`<config directory>/custom_components/braviatv_psk/media_player.py`
 
-Starting with Home Assistant 0.92 you also need to copy the file /custom_components/braviatv_psk/__init__.py to <config directory>/custom_components/braviatv_psk/__init__.py and /custom_components/braviatv_psk/manifest.json to <config directory>/custom_components/braviatv_psk/manifest.json
+Starting with Home Assistant 0.92 you also need to copy the files `/custom_components/braviatv_psk/__init__.py` and `/custom_components/braviatv_psk/manifest.json` to the same directory.
 
 **Example configuration file**
 
